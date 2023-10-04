@@ -1,0 +1,3 @@
+#python-dotenv[cli]
+#sitri[hvac]
+boto

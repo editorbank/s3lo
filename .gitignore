@@ -1,5 +1,12 @@
 __pycache__
+*.pyc
+
 .venv/
+
+*.onefile-build/
+*.dist/
+*.build/
+*.bin
 
 *.whl
 *.bak
@@ -7,3 +14,4 @@ __pycache__
 
 test/
 hello.txt
+s3lo/boto/

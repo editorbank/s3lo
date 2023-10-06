@@ -1,6 +1,6 @@
 import argparse
 import os
-from s3api import S3Config
+from api import S3Config
 
 
 def get_args(prog, version) -> None:

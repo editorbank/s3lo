@@ -5,7 +5,9 @@ import boto
 import boto.s3.connection
 import os
 from pathlib import Path
-  
+
+__version__ = 1.0
+
 class S3Config():
   default_env_prefix = 'S3_'
   prams_list = ('protocol','access_key','secret_key','host','port','bucket')
@@ -77,11 +79,13 @@ class S3API():
   def list(self, *args, **kwargs):
     return [ key.__dict__ for key in self.bucket.list(*args, **kwargs) ]
 
+  def keys_list(self, *args, **kwargs):
+    return [i["name"] for i in self.list(*args, **kwargs)]
+
   def delete(self, key_prefix):
-    for i in self.list(prefix=key_prefix):
-      _iname:str = i['name']
-      if not self.silent: print(f' Delete "{_iname}" ...')
-      self.bucket.delete_key(_iname)
+    for _key in self.keys_list(prefix=key_prefix):
+      if not self.silent: print(f' Delete key "{_key}" ...')
+      self.bucket.delete_key(_key)
 
   def set(self, key:str, value:str=''):
     _key_object = self.bucket.new_key(key)
@@ -108,8 +112,7 @@ class S3API():
   def download(self, key_prefix, add_file_path:str = '',cut_key_prefix:str=None):
     if not add_file_path : add_file_path = ''
     if not cut_key_prefix : cut_key_prefix = ''
-    for i in self.list(prefix=key_prefix):
-      _key:str = i['name']
+    for _key in self.keys_list(prefix=key_prefix):
       _filename = add_file_path + _cut_prefix(_key,cut_key_prefix)
       if not self.is_dir(_key):
         if not self.silent: print(f' Download key "{_key}" to "{_filename}" ...')
@@ -159,9 +162,9 @@ class S3API():
           if not self.silent: print(f'Upload key "{_key}" as empty ...')
           self.set(_key)
 
-if __name__ == "__main__":
-  s3c = S3Config()
-  s3c.init_from_environments_variables()
-  s3 = S3API(s3c)
-  s3.silent = False
-  for i in s3.list(): print(i["name"])
+# if __name__ == "__main__":
+#   s3c = S3Config()
+#   s3c.init_from_environments_variables()
+#   s3 = S3API(s3c)
+#   s3.silent = False
+#   for k in s3.keys_list(): print(k)

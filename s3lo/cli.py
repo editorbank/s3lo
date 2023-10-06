@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
-import os
-from s3api import S3API, S3Config
-from s3if import get_args
+from api import S3API, S3Config
+from ui import get_args
 
-__version__ = '0.0.1'
-
-def main():
-  args = get_args(prog=os.path.basename(__file__),version=__version__)
+def main(prog,version):
+  args = get_args(prog=prog,version=version)
   s3c = S3Config()
   s3c.init_from_other_object(args)
   s3 = S3API(s3c)

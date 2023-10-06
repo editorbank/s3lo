@@ -1,0 +1,1 @@
+docker run -it --rm -v "$(pwd)":"/pwd"  -w "/pwd" --name py2bin-$RANDOM docker.io/editorbank/py2bin /compile.sh s3lo

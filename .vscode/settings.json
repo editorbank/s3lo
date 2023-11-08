@@ -1,0 +1,16 @@
+{
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.extraPaths": [
+    "./s3lo"
+  ],
+  "python.linting.flake8Enabled": false,
+  "python.linting.enabled": true,
+  "python.linting.mypyEnabled": true,
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true
+    }
+  },
+  "python.formatting.provider": "black"
+}

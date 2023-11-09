@@ -1,2 +1,2 @@
 set venv_dir=.venv
-set main_py=s3lo
+set main_py=-m s3lo

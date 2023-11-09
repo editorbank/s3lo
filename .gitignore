@@ -6,12 +6,21 @@ __pycache__
 *.onefile-build/
 *.dist/
 *.build/
+dist/
+build/
 *.bin
+*.egg-info/
 
 *.whl
+*.tar.gz
+*.tgz
 *.bak
 .env
 
 test/
 hello.txt
 s3lo/boto/
+
+*.pyz
+pyz.tmp/
+.vscode/

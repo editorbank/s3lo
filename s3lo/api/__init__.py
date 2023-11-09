@@ -144,24 +144,25 @@ class S3API:
 
     def fs_list(self, root_dir: str = ""):
         ret = []
-        root_dir = self.as_dir(root_dir)
+        if self.is_dir(root_dir):
+            root_dir = self.as_dir(root_dir)
         while root_dir.startswith("./"):
             root_dir = root_dir[2:]
         while root_dir.endswith("/./"):
             root_dir = root_dir[:-2]
         if root_dir == "./":
             root_dir = ""
-        if root_dir != "":
+        if not self.is_dir(root_dir):
             ret.append(root_dir)
-
-        for path in os.scandir(root_dir if root_dir != "" else "."):
-            if path.is_file():
-                file_name = self.as_dir(root_dir) + path.name
-                ret.append(file_name)
-            if path.is_dir():
-                dir_name = self.as_dir(self.as_dir(root_dir) + path.name)
-                # print(dir_name)
-                ret.extend(self.fs_list(dir_name))
+        else:
+            for path in os.scandir(root_dir if root_dir != "" else "."):
+                if path.is_file():
+                    file_name = self.as_dir(root_dir) + path.name
+                    ret.append(file_name)
+                if path.is_dir():
+                    dir_name = self.as_dir(self.as_dir(root_dir) + path.name)
+                    # print(dir_name)
+                    ret.extend(self.fs_list(dir_name))
         return ret
 
     def upload(self, filename, add_key_prefix: str = "", cut_file_path: str = ""):

@@ -3,7 +3,7 @@
 
 @echo Make exe v2 ...
 @setlocal
-@if not exist "%project_name%.pyz" ( 1>&2 echo Error: No found "%project_name%.pyz"! & echo /b 1 )
+@if not exist "%project_name%.pyz" ( 1>&2 echo Error: No found "%project_name%.pyz"! & exit /b 1 )
 @if exist exe2.tmp.zip del /Q exe2.tmp.zip
 @if exist %project_name%.spec del /Q %project_name%.spec
 @if exist exe2.tmp rd /Q /S exe2.tmp

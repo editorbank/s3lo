@@ -27,3 +27,4 @@ s3lo/boto/
 .vscode/
 
 *.spec
+test.cmd

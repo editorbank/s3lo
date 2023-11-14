@@ -1,4 +1,4 @@
-
+@for /F "usebackq" %%I in ( `dir /B /S /A:D __pycache__ 2^>nul` ) do if exist "%%~I" rd /Q /S "%%~I"
 @for /D %%I in (
   .venv
   dist
@@ -9,7 +9,7 @@
 ) do @(
   if exist "%%~I" (
     echo Clean temporary directory "%%~I" ...
-    rd /q /s "%%I"
+    rd /q /s "%%~I"
   )
 )
 @for %%I in (

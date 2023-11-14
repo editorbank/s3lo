@@ -73,6 +73,7 @@ class S3API:
             port=port,
             is_secure=is_secure,  # using ssl
             validate_certs=False,
+            debug=True,
             calling_format=boto.s3.connection.OrdinaryCallingFormat(),
         )
         self.bucket = self.conn.get_bucket(config.bucket)

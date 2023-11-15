@@ -217,9 +217,7 @@ class ConnectionPool(object):
         # The last time the pool was cleaned.
         self.last_clean_time = 0.0
         self.mutex = threading.Lock()
-        ConnectionPool.STALE_DURATION = \
-            config.getfloat('Boto', 'connection_stale_duration',
-                            ConnectionPool.STALE_DURATION)
+        ConnectionPool.STALE_DURATION = ConnectionPool.STALE_DURATION
 
     def __getstate__(self):
         pickled_dict = copy.copy(self.__dict__)
@@ -403,7 +401,7 @@ class AWSAuthConnection(object):
                  https_connection_factory=None, path='/',
                  provider='aws', security_token=None,
                  suppress_consec_slashes=True,
-                 validate_certs=True, profile_name=None):
+                 validate_certs=True, profile_name=None, ca_certificates_file=None):
         """
         :type host: str
         :param host: The host to make the connection to
@@ -455,17 +453,12 @@ class AWSAuthConnection(object):
         """
         self.suppress_consec_slashes = suppress_consec_slashes
         self.num_retries = 6
-        # Override passed-in is_secure setting if value was defined in config.
-        if config.has_option('Boto', 'is_secure'):
-            is_secure = config.getboolean('Boto', 'is_secure')
         self.is_secure = is_secure
         # Whether or not to validate server certificates.
         # The default is now to validate certificates.  This can be
         # overridden in the boto config file are by passing an
         # explicit validate_certs parameter to the class constructor.
-        self.https_validate_certificates = config.getbool(
-            'Boto', 'https_validate_certificates',
-            validate_certs)
+        self.https_validate_certificates = bool(validate_certs)
         if self.https_validate_certificates and not HAVE_HTTPS_CONNECTION:
             raise BotoClientError(
                 "SSL server certificate validation is enabled in boto "
@@ -473,11 +466,7 @@ class AWSAuthConnection(object):
                 "support this feature are not available. Certificate "
                 "validation is only supported when running under Python "
                 "2.6 or later.")
-        certs_file = config.get_value(
-            'Boto', 'ca_certificates_file', DEFAULT_CA_CERTS_FILE)
-        if certs_file == 'system':
-            certs_file = None
-        self.ca_certificates_file = certs_file
+        self.ca_certificates_file = ca_certificates_file
         if port:
             self.port = port
         else:
@@ -509,21 +498,20 @@ class AWSAuthConnection(object):
         # if the value passed in for debug
         if not isinstance(debug, six.integer_types):
             debug = 0
-        self.debug = config.getint('Boto', 'debug', debug)
+        self.debug = debug
         self.host_header = None
 
         # Timeout used to tell http_client how long to wait for socket timeouts.
         # Default is to leave timeout unchanged, which will in turn result in
         # the socket's default global timeout being used. To specify a
-        # timeout, set http_socket_timeout in Boto config. Regardless,
+        # timeout, set http_socket_timeout.  Regardless,
         # timeouts will only be applied if Python is 2.6 or greater.
         self.http_connection_kwargs = {}
         if (sys.version_info[0], sys.version_info[1]) >= (2, 6):
             # If timeout isn't defined in boto config file, use 70 second
             # default as recommended by
             # http://docs.aws.amazon.com/amazonswf/latest/apireference/API_PollForActivityTask.html
-            self.http_connection_kwargs['timeout'] = config.getint(
-                'Boto', 'http_socket_timeout', 70)
+            self.http_connection_kwargs['timeout'] = 70
 
         if isinstance(provider, Provider):
             # Allow overriding Provider
@@ -663,13 +651,13 @@ class AWSAuthConnection(object):
                 self.proxy_pass = match.group('pass')
         else:
             if not self.proxy:
-                self.proxy = config.get_value('Boto', 'proxy', None)
+                self.proxy = None
             if not self.proxy_port:
-                self.proxy_port = config.get_value('Boto', 'proxy_port', None)
+                self.proxy_port = None
             if not self.proxy_user:
-                self.proxy_user = config.get_value('Boto', 'proxy_user', None)
+                self.proxy_user = None
             if not self.proxy_pass:
-                self.proxy_pass = config.get_value('Boto', 'proxy_pass', None)
+                self.proxy_pass = None
 
         if not self.proxy_port and self.proxy:
             print("http_proxy environment variable does not specify "
@@ -782,7 +770,7 @@ class AWSAuthConnection(object):
                 sock.sendall("%s: %s\r\n" % (k, v))
             # See discussion about this config option at
             # https://groups.google.com/forum/?fromgroups#!topic/boto-dev/teenFvOq2Cc
-            if config.getbool('Boto', 'send_crlf_after_proxy_auth_headers', False):
+            if False: #'send_crlf_after_proxy_auth_headers' = False
                 sock.sendall("\r\n")
         else:
             sock.sendall("\r\n")
@@ -887,7 +875,7 @@ class AWSAuthConnection(object):
         body = None
         ex = None
         if override_num_retries is None:
-            num_retries = config.getint('Boto', 'num_retries', self.num_retries)
+            num_retries = self.num_retries
         else:
             num_retries = override_num_retries
         i = 0
@@ -901,8 +889,7 @@ class AWSAuthConnection(object):
 
         while i <= num_retries:
             # Use binary exponential backoff to desynchronize client requests.
-            next_sleep = min(random.random() * (2 ** i),
-                             boto.config.get('Boto', 'max_retry_delay', 60))
+            next_sleep = min(random.random() * (2 ** i), 60)
             try:
                 # we now re-sign each request before it is retried
                 boto.log.debug('Token: %s' % self.provider.security_token)

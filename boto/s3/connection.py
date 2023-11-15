@@ -144,7 +144,7 @@ class HostRequiredError(BotoClientError):
 class S3Connection(AWSAuthConnection):
 
     DefaultHost = 's3.amazonaws.com'
-    DefaultCallingFormat = boto.config.get('s3', 'calling_format', 'boto.s3.connection.SubdomainCallingFormat')
+    DefaultCallingFormat = 'boto.s3.connection.SubdomainCallingFormat'
     QueryString = 'Signature=%s&Expires=%d&AWSAccessKeyId=%s'
 
     def __init__(self, aws_access_key_id=None, aws_secret_access_key=None,
@@ -154,11 +154,11 @@ class S3Connection(AWSAuthConnection):
                  calling_format=DefaultCallingFormat, path='/',
                  provider='aws', bucket_class=Bucket, security_token=None,
                  suppress_consec_slashes=True, anon=False,
-                 validate_certs=None, profile_name=None):
+                 validate_certs=False, profile_name=None, ca_certificates_file=None):
         no_host_provided = False
         # Try falling back to the boto config file's value, if present.
         if host is NoHostProvided:
-            host = boto.config.get('s3', 'host')
+            host = None
             if host is None:
                 host = self.DefaultHost
                 no_host_provided = True

@@ -3,20 +3,32 @@ name = "s3lo"
 version = "1.0.0"
 description = "S3 Loader of Ojects"
 authors = [
-   { name="editorbank"},
+    { name="editorbank"},
 ]
 requires-python = ">=3.7"
 dependencies = [
-   "boto",
+#    "boto",
 ]
 classifiers = [
-   "Programming Language :: Python :: 3",
-   "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
 ]
+
+#------------------------------
 
 [build-system]
 requires=["setuptools>=58.0"]
 build-backend = "setuptools.build_meta"
+
+#[tool.setuptools.packages.find]
+#where = ["src"]
+#include = ["__main__.py","s3lo/**","boto/**"]  # alternatively: `exclude = ["additional*"]`
+#namespaces = true
+
+[tool.setuptools.packages]
+#find = {}  # Scanning implicit namespaces is active by default
+# OR
+find = {namespaces = true}
 
 #------------------------------
 
@@ -30,8 +42,8 @@ license = "MIT"
 readme = "readme.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-boto = "^2"
+python = "^3.7"
+# boto = "^2"
 
 
 [tool.poetry.group.dev.dependencies]

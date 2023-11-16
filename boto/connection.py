@@ -36,7 +36,6 @@ import xml.sax
 import copy
 
 from boto import auth
-from boto import auth_handler
 import boto
 import boto.utils
 import boto.handler
@@ -44,7 +43,6 @@ import boto.cacerts
 
 from boto import config, UserAgent
 from boto.compat import six, http_client, urlparse, quote, encodebytes
-from boto.exception import AWSConnectionError
 from boto.exception import BotoClientError
 from boto.exception import BotoServerError
 from boto.exception import PleaseRetryException
@@ -699,6 +697,7 @@ class AWSAuthConnection(object):
         host = boto.utils.parse_host(host)
 
         http_connection_kwargs = self.http_connection_kwargs.copy()
+        http_connection_kwargs["check_hostname"]=self.https_validate_certificates
 
         # Connection factories below expect a port keyword argument
         http_connection_kwargs['port'] = port
